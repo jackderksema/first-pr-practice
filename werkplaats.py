@@ -3,6 +3,8 @@
 Een eerste opzet op basis van een paar ideeën:
 
 - ``Apparaat``: een apparaat in de werkplaats, met (optioneel) garantie.
+  Een apparaat kan ook een leenapparaat zijn dat aan een klant wordt
+  uitgeleend zolang zijn eigen apparaat in de werkplaats staat.
 - ``Bakwagen``: bewust begrensd gehouden — alleen kenteken en maximale lading.
 - ``Taak``: een taak op het takenbord, eventueel gekoppeld aan een apparaat.
 - ``Takenbord``: taken toevoegen, afronden en opvragen.
@@ -22,6 +24,30 @@ class Apparaat:
 
     naam: str
     garantie_tot: date | None = None
+    is_leenapparaat: bool = False
+    uitgeleend_aan: str | None = None
+
+    def leen_uit(self, klant: str) -> None:
+        """Leen dit leenapparaat uit aan een klant.
+
+        Gooit een ``ValueError`` als dit geen leenapparaat is of als het
+        al bij een klant staat.
+        """
+        if not self.is_leenapparaat:
+            raise ValueError(f"{self.naam!r} is geen leenapparaat")
+        if self.uitgeleend_aan is not None:
+            raise ValueError(
+                f"{self.naam!r} is al uitgeleend aan {self.uitgeleend_aan}"
+            )
+        self.uitgeleend_aan = klant
+
+    def neem_terug(self) -> None:
+        """Neem het leenapparaat weer in bij de werkplaats."""
+        self.uitgeleend_aan = None
+
+    def is_beschikbaar(self) -> bool:
+        """Geef aan of dit leenapparaat nu uitgeleend kan worden."""
+        return self.is_leenapparaat and self.uitgeleend_aan is None
 
     def heeft_garantie(self, op: date | None = None) -> bool:
         """Geef aan of het apparaat op de gegeven dag nog garantie heeft.

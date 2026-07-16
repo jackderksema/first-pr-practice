@@ -15,8 +15,9 @@ print(greet("Jack"))   # -> "Hello, Jack!"
 ## Takenbord koelwerkplaats
 
 [`werkplaats.py`](werkplaats.py) bevat een eerste opzet van een takenbord
-voor de koelwerkplaats: apparaten met garantie, een (bewust begrensde)
-bakwagen en een takenbord met voorbeeldtaken.
+voor de koelwerkplaats: apparaten met garantie (waaronder leenapparaten
+die je aan een klant kunt uitlenen), een (bewust begrensde) bakwagen en
+een takenbord met voorbeeldtaken.
 
 ```python
 from werkplaats import standaard_takenbord

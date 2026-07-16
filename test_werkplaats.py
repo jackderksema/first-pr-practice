@@ -51,6 +51,33 @@ def test_apparaat_zonder_garantiedatum_heeft_geen_garantie():
     assert not oude_koelkast.heeft_garantie(op=date(2026, 1, 1))
 
 
+def test_leenapparaat_uitlenen_en_terugnemen():
+    leenkast = Apparaat("Leenkoelkast", is_leenapparaat=True)
+    assert leenkast.is_beschikbaar()
+
+    leenkast.leen_uit("Bakkerij Jansen")
+    assert leenkast.uitgeleend_aan == "Bakkerij Jansen"
+    assert not leenkast.is_beschikbaar()
+
+    leenkast.neem_terug()
+    assert leenkast.uitgeleend_aan is None
+    assert leenkast.is_beschikbaar()
+
+
+def test_leenapparaat_kan_niet_dubbel_uitgeleend_worden():
+    leenkast = Apparaat("Leenkoelkast", is_leenapparaat=True)
+    leenkast.leen_uit("Bakkerij Jansen")
+    with pytest.raises(ValueError):
+        leenkast.leen_uit("Slagerij de Vries")
+
+
+def test_gewoon_apparaat_kan_niet_uitgeleend_worden():
+    werkbank = Apparaat("Koelwerkbank")
+    assert not werkbank.is_beschikbaar()
+    with pytest.raises(ValueError):
+        werkbank.leen_uit("Bakkerij Jansen")
+
+
 def test_bakwagen_is_begrensd():
     wagen = Bakwagen(kenteken="VX-123-B", max_lading_kg=1000)
     assert wagen.kan_laden(800)
