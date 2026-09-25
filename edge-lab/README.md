@@ -14,3 +14,12 @@ Draaien: `pip install numpy`, daarna `python3 sens.py` en `python3 protocol.py`.
 `research.py` leest de overfitting-resultaten uit `research.json` en draait alleen de funding-sweep opnieuw.
 
 Belangrijkste uitkomst: van 800 markten zonder bruikbare edge kwamen 0 nep-winnaars door beide poorten.
+
+## Echte data (1954–2026)
+
+| Bestand | Wat het doet |
+|---|---|
+| `multi.py` | 15 vooraf vastgelegde strategieën op echte koersen (aandelen, obligaties, goud, olie, crypto); test t/m 1999 en daarna |
+| `portfolio.py` | Portefeuille die alleen op data t/m 1999 is gekozen, getest op 2000–2026, plus bootstrap over 10 jaar |
+
+Data komt van `raw.githubusercontent.com/datasets/*` en `coinmetrics/data`. Download de CSV's naar `data/` zoals in de scripts staat.

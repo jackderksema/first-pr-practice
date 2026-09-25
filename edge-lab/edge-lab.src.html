@@ -126,8 +126,29 @@ ol.plan .money small{display:block;font:.75rem var(--body);color:var(--ink-3)}
   <span class="eyebrow">Onderzoeksdossier · 10k startkapitaal</span>
   <h1>Edge Lab</h1>
   <p class="lede">Wat we met simulaties hebben vastgesteld, wat het fundament is en welke rekenmodellen we gebruiken voordat er één euro echt geld in gaat.</p>
-  <div class="meta"><span>25 sep 2026</span><span>1.220.000 backtests</span><span>3.000 × 1 jaar funding-paden</span><span>synthetische data, geen live markt</span></div>
+  <div class="meta"><span>25 sep 2026</span><span>1.220.000 backtests</span><span>3.000 × 1 jaar funding-paden</span><span>echte koersen 1954–2026</span><span>15 vooraf vastgelegde strategieën</span></div>
 </header>
+
+<section aria-labelledby="h-real">
+  <div class="sec-head"><span class="eyebrow">Echte data · 1954–2026</span><h2 id="h-real">15 strategieën over aandelen, obligaties, goud, olie en crypto</h2>
+  <p>Echte historische koersen. Alle regels lagen vooraf vast uit de literatuur; er is niets geoptimaliseerd. Getest in twee delen: tot en met 1999 (crypto: 2019) en daarna. DSR is de kans dat de Sharpe echt is, gecorrigeerd voor 15 geteste strategieën.</p></div>
+  <div class="findings">
+    <div class="finding"><span class="pill good">Gekozen in 1999, getest daarna</span><div class="from">€10.000 in jan 2000 → aug 2026</div><div class="big"><span class="pos" id="pf-a"></span></div><div class="from">tegen S&amp;P 500 kopen en houden</div><div class="big" id="pf-s"></div><p id="pf-note"></p></div>
+    <div class="finding"><span class="pill good">Minder diepe dalen</span><div class="from">grootste daling vanaf een top</div><div class="big"><span id="pf-dda"></span></div><div class="from">S&amp;P 500</div><div class="big"><span class="neg" id="pf-dds"></span></div><p>In euro's (zonder valuta-afdekking) was dat −33% tegen −60%.</p></div>
+    <div class="finding"><span class="pill warn">10 jaar vooruit, €10.000</span><div class="from">mediaan · 5% slechtste uitkomst</div><div class="big"><span id="bt-a"></span></div><div class="from">S&amp;P 500 alleen</div><div class="big" id="bt-s"></div><p id="bt-note"></p></div>
+  </div>
+  <div class="chart-card" id="card-eq">
+    <h3>€10.000 belegd in januari 2000 (rendementen in dollars)</h3>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Portefeuille gekozen op data t/m 1999</span><span><i style="background:var(--s2)"></i>S&amp;P 500 kopen en houden</span></div>
+    <svg class="chart" id="eqc" viewBox="0 0 960 340" role="img" aria-label="Lijngrafiek: groei van €10.000 vanaf 2000 voor de portefeuille en de S&amp;P 500"></svg>
+    <p class="caption" id="eq-cap"></p>
+  </div>
+  <div class="chart-card">
+    <h3>Alle 15 strategieën, gerangschikt</h3>
+    <div class="tbl-wrap"><table id="multi-tbl"></table></div>
+    <p class="caption">Rendementen per jaar, na 0,1% (crypto 0,2%) kosten per omzet. Obligaties benaderd uit de 10-jaarsrente (duratie 8), cash als 10-jaarsrente −1,5%. Olie is spotprijs en niet direct verhandelbaar. Crypto-data loopt tot mei 2026.</p>
+  </div>
+</section>
 
 <section aria-labelledby="h-find">
   <div class="sec-head"><span class="eyebrow">Vastgesteld</span><h2 id="h-find">Drie uitkomsten van het onderzoek</h2></div>
@@ -439,11 +460,42 @@ function calcKelly(seed){
   $("k-v").textContent = kf<=0 ? "Geen positieve verwachting: bij deze winkans en verhouding is elke inzet te veel." : `Kelly zegt maximaal ${pct(kf)} per trade. Boven Kelly daalt het verwachte groeitempo en stijgt de kans op een halvering sterk.`;
 }
 
+
+/* echte data */
+const VL={proven:["good","Bewezen"],likely:["warn","Waarschijnlijk"],late:["warn","Pas na 2000 sterk"],short:["warn","Te korte historie"],fail:["crit","Afgevallen"]};
+function realData(){
+  const P=DATA.pf;
+  $("pf-a").textContent=eur(P.A_oos.end10k); $("pf-s").textContent=eur(P.spx_oos.end10k);
+  $("pf-note").textContent=`${pct(P.A_oos.cagr)} per jaar tegen ${pct(P.spx_oos.cagr)}, met ${pct(P.A_oos.vol,0)} in plaats van ${pct(P.spx_oos.vol,0)} beweeglijkheid. Selectie: ${P.selected.length} strategieën die vóór 2000 de toets haalden, gelijk gewogen.`;
+  $("pf-dda").textContent=pct(P.A_oos.maxdd,0).replace("-","−"); $("pf-dds").textContent=pct(P.spx_oos.maxdd,0).replace("-","−");
+  $("bt-a").innerHTML=`${eur(P.boot_A.p50)} · <span class="${P.boot_A.p5<10000?'neg':''}">${eur(P.boot_A.p5)}</span>`;
+  $("bt-s").innerHTML=`${eur(P.boot_spx.p50)} · <span class="neg">${eur(P.boot_spx.p5)}</span>`;
+  $("bt-note").textContent=`Bootstrap van 20.000 paden uit de maanden 2000–2026. Kans op verlies na 10 jaar: ${pct(P.boot_A.p_loss)} tegen ${pct(P.boot_spx.p_loss)}. Het verleden garandeert niets.`;
+  let h="<tr><th>Strategie</th><th>Markt</th><th>Oordeel</th><th>Sharpe t/m 1999</th><th>Rendement/jr daarna</th><th>Sharpe daarna</th><th>Grootste daling</th><th>DSR daarna</th></tr>";
+  DATA.multi.forEach(r=>{const v=VL[r.verdict];h+=`<tr><td>${r.name}</td><td>${r.market}</td><td><span class="pill ${v[0]}">${v[1]}</span></td><td>${r.is_sr==null?"—":r.is_sr.toFixed(2)}</td><td>${pct(r.oos_cagr)}</td><td>${r.oos_sr.toFixed(2)}</td><td class="neg">${pct(r.oos_dd,0).replace("-","−")}</td><td>${pct(r.oos_dsr,0)}</td></tr>`;});
+  $("multi-tbl").innerHTML=h;
+  $("eq-cap").textContent=`Slechtste 12 maanden: portefeuille −22%, S&P 500 −41%. De portefeuille bestaat uit: ${P.selected.join(", ")}.`;
+}
+function drawEq(){
+  const svg=$("eqc");svg.innerHTML="";const card=$("card-eq");const E=DATA.eq;
+  const W=960,H=340,m={l:62,r:16,t:12,b:34};const n=E.dates.length;
+  const ymax=Math.max(...E.A,...E.spx);const ys=[0,Math.ceil(ymax/20000)*20000];
+  const X=i=>m.l+i/(n-1)*(W-m.l-m.r),Y=v=>H-m.b-(v-ys[0])/(ys[1]-ys[0])*(H-m.t-m.b);
+  for(const t of niceTicks(ys[0],ys[1],5)){el("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),stroke:css("--grid")},svg);el("text",{x:m.l-8,y:Y(t)+4,"text-anchor":"end"},svg).textContent=kfmt(t);}
+  E.dates.forEach((d,i)=>{if(d.endsWith("-01")&&(+d.slice(0,4))%5===0)el("text",{x:X(i),y:H-m.b+18,"text-anchor":"middle"},svg).textContent=d.slice(0,4);});
+  [["spx","--s2"],["A","--s1"]].forEach(([k,c])=>{el("path",{d:E[k].map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+","+Y(v).toFixed(1)).join(""),fill:"none",stroke:css(c),"stroke-width":2,"stroke-linejoin":"round"},svg);
+    const i=n-1;el("circle",{cx:X(i),cy:Y(E[k][i]),r:4,fill:css(c),stroke:css("--surface"),"stroke-width":2},svg);});
+  const cross=el("line",{y1:m.t,y2:H-m.b,stroke:css("--ink-3"),"stroke-dasharray":"3 3",visibility:"hidden"},svg);
+  const hit=el("rect",{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:"transparent"},svg);
+  hit.addEventListener("pointermove",e=>{const r=svg.getBoundingClientRect();const px=(e.clientX-r.left)/r.width*W;const i=Math.max(0,Math.min(n-1,Math.round((px-m.l)/(W-m.l-m.r)*(n-1))));cross.setAttribute("x1",X(i));cross.setAttribute("x2",X(i));cross.setAttribute("visibility","visible");showTip(card,e,`${E.dates[i]}<br>portefeuille ${eur(E.A[i])}<br>S&amp;P 500 ${eur(E.spx[i])}`);});
+  hit.addEventListener("pointerleave",()=>{cross.setAttribute("visibility","hidden");hideTip(card);});
+}
+
 function all(){calcDSR();calcFund();calcLP();}
 document.querySelectorAll(".calc input").forEach(i=>i.addEventListener("input",()=>{all();if(i.id.startsWith("k-"))calcKelly();}));
 $("k-run").addEventListener("click",()=>calcKelly(Math.floor(Math.random()*1e9)));
-function drawAll(){drawScatter();drawBars();}
-fillTables();all();calcKelly();drawAll();
+function drawAll(){drawScatter();drawBars();drawEq();}
+realData();fillTables();all();calcKelly();drawAll();
 new MutationObserver(drawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",drawAll);
 </script>
