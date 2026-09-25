@@ -1,0 +1,1 @@
+{"random": {"markets": 400, "pass_rate": 0.04, "fwd_pos_all": 0.4275, "fwd_pos_passed": 0.5625, "fwd_eur_passed": 305.1179617074706, "n_passed": 16, "n_passed_both": 0}, "momentum": {"markets": 400, "pass_rate": 0.0525, "fwd_pos_all": 0.4275, "fwd_pos_passed": 0.5714285714285714, "fwd_eur_passed": 446.2938718984333, "n_passed": 21, "n_passed_both": 0}}

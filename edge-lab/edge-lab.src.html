@@ -1,0 +1,449 @@
+<title>Edge Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --paper:#f4f6f5; --surface:#fcfcfb; --ink:#12181b; --ink-2:#4a5357; --ink-3:#7a8488;
+  --rule:#d9dfde; --grid:#e6eae9; --accent:#1c5cab; --accent-soft:#e3edf9;
+  --s1:#2a78d6; --s2:#eb6834;
+  --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --good-ink:#006300; --crit-ink:#b02a2a;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#111415; --surface:#1a1a19; --ink:#eef1f0; --ink-2:#b9c1c0; --ink-3:#8a9392;
+    --rule:#2c3232; --grid:#262b2b; --accent:#6da7ec; --accent-soft:#1a2a3d;
+    --s1:#3987e5; --s2:#d95926; --good-ink:#4cc94c; --crit-ink:#ee7a7a;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#111415; --surface:#1a1a19; --ink:#eef1f0; --ink-2:#b9c1c0; --ink-3:#8a9392;
+  --rule:#2c3232; --grid:#262b2b; --accent:#6da7ec; --accent-soft:#1a2a3d;
+  --s1:#3987e5; --s2:#d95926; --good-ink:#4cc94c; --crit-ink:#ee7a7a;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);padding-inline:16px;padding-block:28px 64px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.7rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.15rem;font-weight:500}
+p{margin:0;max-width:68ch}
+.eyebrow{font:600 .75rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{font-size:1.15rem;color:var(--ink-2)}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{display:flex;flex-direction:column;gap:14px;padding-top:8px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;font:.8rem var(--mono);color:var(--ink-3)}
+section{display:flex;flex-direction:column;gap:20px}
+.sec-head{display:flex;flex-direction:column;gap:8px;border-top:2px solid var(--ink);padding-top:14px}
+
+/* findings */
+.findings{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.finding{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.finding .big{font:600 1.9rem/1 var(--mono);font-variant-numeric:tabular-nums}
+.finding .from{font:.85rem var(--mono);color:var(--ink-3)}
+.finding p{font-size:.95rem;color:var(--ink-2)}
+.neg{color:var(--crit-ink)} .pos{color:var(--good-ink)}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 .72rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:5px 8px;border-radius:99px;border:1px solid currentColor;width:max-content}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.good{color:var(--good-ink)} .pill.crit{color:var(--crit-ink)} .pill.warn{color:#9a6a00}
+:root[data-theme="dark"] .pill.warn{color:var(--warn)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pill.warn{color:var(--warn)}}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--surface)}
+.pillar{padding:18px;display:flex;flex-direction:column;gap:8px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.pillar:nth-child(3n){border-right:0}
+.pillar:nth-last-child(-n+3){border-bottom:0}
+.pillar .test{font:.82rem/1.45 var(--mono);color:var(--ink-2);background:var(--accent-soft);padding:8px 10px;border-radius:4px}
+.pillar p{font-size:.95rem;color:var(--ink-2)}
+
+/* charts */
+.chart-card{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:12px;position:relative}
+.chart-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.85rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+svg.chart{width:100%;height:auto;display:block;overflow:visible}
+svg.chart text{fill:var(--ink-3);font:11px var(--mono)}
+svg.chart .axis-title{fill:var(--ink-2);font:12px var(--body)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font:.78rem/1.4 var(--mono);padding:7px 9px;border-radius:4px;white-space:nowrap;z-index:5}
+.caption{font-size:.88rem;color:var(--ink-3)}
+details.table-view summary{cursor:pointer;font-size:.85rem;color:var(--accent)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font:.85rem var(--mono);font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--ink-2)}
+
+/* calculators */
+.calcs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.calc{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.formula{font:.85rem/1.5 var(--mono);overflow-wrap:anywhere;color:var(--ink-2);border-left:3px solid var(--accent);padding:4px 0 4px 10px}
+.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.8rem;color:var(--ink-2)}
+.field input{font:.95rem var(--mono);padding:7px 9px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink);width:100%}
+.field input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.out{display:flex;flex-direction:column;gap:6px;border-top:1px dashed var(--rule);padding-top:12px}
+.out .row{display:flex;justify-content:space-between;gap:12px;font-size:.92rem}
+.out .row b{font:600 .95rem var(--mono);font-variant-numeric:tabular-nums}
+.verdict{font-size:.92rem;color:var(--ink-2)}
+button{font:600 .85rem var(--body);background:var(--accent);color:#fff;border:0;border-radius:4px;padding:8px 12px;cursor:pointer;width:max-content}
+:root[data-theme="dark"] button{color:#0d1a2a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button{color:#0d1a2a}}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* plan */
+ol.plan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0;counter-reset:step}
+ol.plan li{counter-increment:step;display:grid;grid-template-columns:56px 1fr 150px;row-gap:6px;gap:16px;padding:16px 0;border-bottom:1px solid var(--rule);align-items:start}
+ol.plan li::before{content:counter(step);font:700 1.6rem/1 var(--display);color:var(--accent)}
+ol.plan .gate{font:.82rem/1.45 var(--mono);color:var(--ink-2);margin-top:6px}
+ol.plan .gate b{color:var(--ink)}
+ol.plan .money{font:600 1rem var(--mono);text-align:right}
+ol.plan .money small{display:block;font:.75rem var(--body);color:var(--ink-3)}
+.assume{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:18px}
+.assume ul{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--ink-2);font-size:.95rem}
+
+@media (max-width:860px){
+  .findings,.pillars,.chart-grid,.calcs{grid-template-columns:1fr}
+  .pillar{border-right:0!important;border-bottom:1px solid var(--rule)!important}
+  .pillar:last-child{border-bottom:0!important}
+  ol.plan li{grid-template-columns:40px 1fr}
+  ol.plan .money{grid-column:2;text-align:left}
+}
+@media (max-width:480px){.fields{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Onderzoeksdossier · 10k startkapitaal</span>
+  <h1>Edge Lab</h1>
+  <p class="lede">Wat we met simulaties hebben vastgesteld, wat het fundament is en welke rekenmodellen we gebruiken voordat er één euro echt geld in gaat.</p>
+  <div class="meta"><span>25 sep 2026</span><span>1.220.000 backtests</span><span>3.000 × 1 jaar funding-paden</span><span>synthetische data, geen live markt</span></div>
+</header>
+
+<section aria-labelledby="h-find">
+  <div class="sec-head"><span class="eyebrow">Vastgesteld</span><h2 id="h-find">Drie uitkomsten van het onderzoek</h2></div>
+  <div class="findings">
+    <div class="finding">
+      <span class="pill crit">Patroonzoeken faalt</span>
+      <div class="from">beste backtest van 1.525 strategieën</div>
+      <div class="big"><span class="pos">+€13.059</span></div>
+      <div class="from">daarna op nieuwe data</div>
+      <div class="big"><span class="neg">−€2.409</span></div>
+      <p>Mediaan over 200 willekeurige markten. Maar 35,5% van de winnaars bleef positief. Zoeken tot iets werkt levert toeval op.</p>
+    </div>
+    <div class="finding">
+      <span class="pill warn">Kleine echte edge onvindbaar</span>
+      <div class="from">markt mét echt momentum (φ = 0,03)</div>
+      <div class="big"><span class="neg">36%</span></div>
+      <div class="from">van de backtest-winnaars bleef positief</div>
+      <p>Ook als er echt een klein voordeel in de markt zit, vindt blind zoeken het niet terug na fees. Een edge moet een reden hebben, geen grafiekpatroon.</p>
+    </div>
+    <div class="finding">
+      <span class="pill good">Structurele edge: afhankelijk van niveau</span>
+      <div class="from">funding-arb, 2× hefboom, per jaar op 10k</div>
+      <div class="big"><span class="neg">−€103</span> → <span class="pos">+€590</span></div>
+      <p>Verwachte uitkomst bij 5% en 25% gemiddelde funding, inclusief staartrisico. Het funding-niveau en het beursrisico bepalen alles.</p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-fund">
+  <div class="sec-head"><span class="eyebrow">Fundament</span><h2 id="h-fund">Waar we goed in moeten zijn</h2>
+  <p>Elke pijler heeft een test die een strategie moet doorstaan. Faalt één test, dan gaat er geen geld in.</p></div>
+  <div class="pillars">
+    <div class="pillar"><h3>Structurele edge</h3><p>Weten wie ons betaalt en waarom niemand het wegneemt. Funding betalen hefboom-longs; arbitrage betaalt de trage markt.</p><div class="test">Test: de reden in één zin kunnen opschrijven, zonder het woord "patroon".</div></div>
+    <div class="pillar"><h3>Kostenmodel</h3><p>Fees, spread, slippage, gas, leenrente, bridge-kosten. De meeste strategieën sterven hier.</p><div class="test">Test: blijft winstgevend bij 2× de geschatte kosten.</div></div>
+    <div class="pillar"><h3>Statistiek</h3><p>Out-of-sample testen en elke poging tellen. Hoe meer geprobeerd, hoe hoger de lat.</p><div class="test">Test: probabilistische Sharpe &gt; 95% na correctie voor aantal pogingen.</div></div>
+    <div class="pillar"><h3>Risico &amp; positiegrootte</h3><p>Half-Kelly als maximum. Staartrisico's apart: beurs-faillissement, ADL, depeg, smart-contract-hack.</p><div class="test">Test: slechtste scenario kost &lt; 20% van het kapitaal.</div></div>
+    <div class="pillar"><h3>Executie &amp; infrastructuur</h3><p>Betrouwbare data, API-limieten, foutafhandeling, logging van elke order.</p><div class="test">Test: 4 weken paper trading zonder handmatige ingreep.</div></div>
+    <div class="pillar"><h3>Administratie &amp; regels</h3><p>Belasting (box 3 of box 1 bij actieve handel), MiCA, KYC, boekhouding per trade.</p><div class="test">Test: elke euro winst of verlies is herleidbaar tot een trade.</div></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-res">
+  <div class="sec-head"><span class="eyebrow">Onderzoek</span><h2 id="h-res">De simulaties</h2></div>
+  <div class="chart-grid">
+    <div class="chart-card" id="card-of">
+      <h3>Backtest-winnaar tegen de echte uitkomst</h3>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Willekeurige markt</span><span><i style="background:var(--s2)"></i>Markt met klein echt momentum</span></div>
+      <svg class="chart" id="sc" viewBox="0 0 560 380" role="img" aria-label="Spreidingsdiagram: resultaat van de beste backtest in jaar 1 tegen het resultaat in jaar 2, per markt"></svg>
+      <p class="caption">Elke stip is één markt (400 in totaal). Per markt is uit 1.525 MA-strategieën de beste in jaar 1 gekozen. Alles onder de nullijn verloor geld in jaar 2.</p>
+      <details class="table-view"><summary>Samenvatting als tabel</summary><div class="tbl-wrap"><table>
+        <tr><th>Markt</th><th>Backtest (mediaan)</th><th>Jaar 2 (mediaan)</th><th>Jaar 2 positief</th></tr>
+        <tr><td>Willekeurig</td><td>+€13.059</td><td>−€2.409</td><td>35,5%</td></tr>
+        <tr><td>Klein momentum</td><td>+€13.653</td><td>−€2.492</td><td>36,0%</td></tr>
+      </table></div></details>
+    </div>
+    <div class="chart-card" id="card-fa">
+      <h3>Funding-arb: verwachte winst per jaar op €10.000</h3>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Zonder staartrisico</span><span><i style="background:var(--s2)"></i>Met staartrisico</span></div>
+      <svg class="chart" id="bars" viewBox="0 0 480 380" role="img" aria-label="Staafdiagram: verwachte winst per jaar bij verschillende funding-niveaus, met en zonder staartrisico"></svg>
+      <p class="caption">2× hefboom, instap bij 7-daags gemiddelde &gt; 5%/jr. Staartrisico = 3%/jr kans op verlies van beurs-onderpand plus 5%/jr kans dat de hedge breekt (ADL, depeg).</p>
+      <details class="table-view"><summary>Alle cijfers als tabel</summary><div class="tbl-wrap"><table id="sens-tbl"></table></div></details>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h3>Hefboom verandert vooral het slechte scenario</h3>
+    <p class="caption">Funding-scenario met gemiddeld ~2%/jr (lange negatieve periodes zoals in 2026). Mediaan en 5%-slechtste uitkomst per jaar op €10.000, 3.000 paden.</p>
+    <div class="tbl-wrap"><table id="grid-tbl"></table></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-prot">
+  <div class="sec-head"><span class="eyebrow">Bescherming</span><h2 id="h-prot">Waarom toeval ons niet kan misleiden</h2>
+  <p>Het protocol: kiezen op trainingsdata, daarna precies één test op validatiedata die niet is aangeraakt, daarna een tweede onafhankelijke test (paper trading op toekomstige data). Een strategie moet beide poorten halen met 95% zekerheid. Gemeten op 800 markten zonder bruikbare edge:</p></div>
+  <div class="tbl-wrap"><table>
+    <tr><th>Stap</th><th>Nep-winnaars die doorkomen</th><th>Wat dat betekent</th></tr>
+    <tr><td>Alleen backtest</td><td class="neg">800 van 800 (100%)</td><td>Elke markt levert een "winnaar" op</td></tr>
+    <tr><td>+ validatiepoort (½ jaar)</td><td>37 van 800 (4,6%)</td><td>Zoals ontworpen: 95%-drempel laat ~5% door</td></tr>
+    <tr><td>+ forward-poort (½ jaar)</td><td class="pos">0 van 800 (0%)</td><td>Verwacht ~0,25% (5% × 5%)</td></tr>
+  </table></div>
+  <div class="tbl-wrap"><table>
+    <tr><th>Echte Sharpe van een strategie</th><th>0</th><th>0,5</th><th>1</th><th>2</th><th>3</th><th>4</th></tr>
+    <tr><td>Kans om één poort van ½ jaar te halen</td><td>6%</td><td>10%</td><td>18%</td><td>42%</td><td>69%</td><td>88%</td></tr>
+  </table></div>
+  <p class="caption">De prijs van deze zekerheid: een zwakke echte edge (Sharpe &lt; 2) wordt vaak ook afgewezen. Meer testdata verhoogt die kans; de poort verlagen verhoogt alleen het aantal nep-winnaars.</p>
+</section>
+
+<section aria-labelledby="h-calc">
+  <div class="sec-head"><span class="eyebrow">Rekenmodellen</span><h2 id="h-calc">De wiskunde, om zelf mee te rekenen</h2>
+  <p>Vier modellen die elke strategie moet doorlopen. Pas de getallen aan; alles rekent direct.</p></div>
+  <div class="calcs">
+
+    <div class="calc">
+      <h3>Is mijn backtest toeval?</h3>
+      <div class="formula">E[max SR] ≈ σ₀·((1−γ)·Φ⁻¹(1−1/N) + γ·Φ⁻¹(1−1/(N·e)))<br>PSR ≈ Φ((SR − E[max SR]) · √T) &nbsp;(Lo 2002, per-periode-Sharpe klein)</div>
+      <div class="fields">
+        <div class="field"><label for="d-n">Onafhankelijke pogingen (N)</label><input id="d-n" type="number" min="1" value="100"></div>
+        <div class="field"><label for="d-t">Jaren testdata (T)</label><input id="d-t" type="number" min="0.1" step="0.1" value="1"></div>
+        <div class="field"><label for="d-sr">Gevonden Sharpe (per jaar)</label><input id="d-sr" type="number" step="0.1" value="1.5"></div>
+      </div>
+      <div class="out">
+        <div class="row"><span>Verwachte beste Sharpe bij puur toeval</span><b id="d-emax"></b></div>
+        <div class="row"><span>Kans dat de edge echt is</span><b id="d-psr"></b></div>
+        <div class="verdict" id="d-v"></div>
+      </div>
+    </div>
+
+    <div class="calc">
+      <h3>Funding-arbitrage</h3>
+      <div class="formula">notional = C · L / (L + 1)<br>E[winst] = notional·f·q − n·notional·c − p·s·C</div>
+      <div class="fields">
+        <div class="field"><label for="f-c">Kapitaal C (€)</label><input id="f-c" type="number" value="10000"></div>
+        <div class="field"><label for="f-l">Hefboom L</label><input id="f-l" type="number" min="1" step="0.5" value="2"></div>
+        <div class="field"><label for="f-f">Gem. funding f (%/jr)</label><input id="f-f" type="number" step="0.5" value="10"></div>
+        <div class="field"><label for="f-q">Tijd in positie q (%)</label><input id="f-q" type="number" value="60"></div>
+        <div class="field"><label for="f-n">In- en uitstappen per jaar n</label><input id="f-n" type="number" value="6"></div>
+        <div class="field"><label for="f-cost">Kosten per rondje c (%)</label><input id="f-cost" type="number" step="0.01" value="0.15"></div>
+        <div class="field"><label for="f-p">Kans staartgebeurtenis p (%/jr)</label><input id="f-p" type="number" step="0.5" value="5"></div>
+        <div class="field"><label for="f-s">Verlies bij staart s (% van C)</label><input id="f-s" type="number" value="30"></div>
+      </div>
+      <div class="out">
+        <div class="row"><span>Bruto funding</span><b id="f-g"></b></div>
+        <div class="row"><span>Kosten</span><b id="f-k"></b></div>
+        <div class="row"><span>Verwacht staartverlies</span><b id="f-t"></b></div>
+        <div class="row"><span>Verwachte winst per jaar</span><b id="f-e"></b></div>
+        <div class="row"><span>Jaar waarin het misgaat</span><b id="f-b"></b></div>
+      </div>
+    </div>
+
+    <div class="calc">
+      <h3>Liquidity providing tegen LVR</h3>
+      <div class="formula">LVR per jaar ≈ k · σ² / 8 &nbsp;(constant-product pool)<br>netto ≈ fee-APR − LVR − beheerkosten</div>
+      <div class="fields">
+        <div class="field"><label for="l-s">Volatiliteit σ (%/jr)</label><input id="l-s" type="number" value="60"></div>
+        <div class="field"><label for="l-f">Fee-opbrengst full range (%/jr)</label><input id="l-f" type="number" step="0.5" value="4"></div>
+        <div class="field"><label for="l-k">Concentratiefactor k</label><input id="l-k" type="number" min="1" step="0.5" value="4"></div>
+        <div class="field"><label for="l-g">Beheer/gas (%/jr)</label><input id="l-g" type="number" step="0.5" value="2"></div>
+      </div>
+      <div class="out">
+        <div class="row"><span>Fees (× k)</span><b id="l-fo"></b></div>
+        <div class="row"><span>LVR (verlies aan arbitrageurs)</span><b id="l-lo"></b></div>
+        <div class="row"><span>Netto per jaar</span><b id="l-n"></b></div>
+        <div class="verdict" id="l-v"></div>
+      </div>
+    </div>
+
+    <div class="calc">
+      <h3>Positiegrootte (Kelly)</h3>
+      <div class="formula">f* = p − (1 − p) / b<br>simulatie: 1.000 paden × 200 trades</div>
+      <div class="fields">
+        <div class="field"><label for="k-p">Winkans p (%)</label><input id="k-p" type="number" value="55"></div>
+        <div class="field"><label for="k-b">Winst/verlies-verhouding b</label><input id="k-b" type="number" step="0.1" value="1"></div>
+        <div class="field"><label for="k-u">Jouw inzet per trade (% kapitaal)</label><input id="k-u" type="number" step="0.5" value="25"></div>
+      </div>
+      <button type="button" id="k-run">Simulatie opnieuw draaien</button>
+      <div class="tbl-wrap"><table id="k-tbl"></table></div>
+      <div class="verdict" id="k-v"></div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-plan">
+  <div class="sec-head"><span class="eyebrow">Plan</span><h2 id="h-plan">Van onderzoek naar geld, met poorten</h2>
+  <p>Elke stap heeft een poort. Haalt een strategie de poort niet, dan terug naar de vorige stap of stoppen.</p></div>
+  <ol class="plan">
+    <li><div style="display:flex;flex-direction:column;gap:6px"><h3>Fundament en gereedschap</h3><p>Datastroom opzetten (netwerktoegang tot beurs-API's), kostenmodel per beurs, backtest-raamwerk met strikte scheiding train/test, logboek van elke poging.</p><div class="gate"><b>Poort:</b> raamwerk reproduceert de resultaten op deze pagina.</div></div><div class="money">€0<small>week 1–2</small></div></li>
+    <li><div style="display:flex;flex-direction:column;gap:6px"><h3>Hypotheses backtesten</h3><p>Twee à drie strategieën met een structurele reden: funding-verschillen tussen beurzen, cross-chain-prijsverschillen, en jouw eigen pool-arbitrage.</p><div class="gate"><b>Poort:</b> PSR &gt; 95% na correctie voor pogingen, winst bij 2× kosten.</div></div><div class="money">€0<small>week 2–4</small></div></li>
+    <li><div style="display:flex;flex-direction:column;gap:6px"><h3>Paper trading op live data</h3><p>Bot draait continu, plaatst virtuele orders tegen echte orderboeken, logt alles.</p><div class="gate"><b>Poort:</b> minstens 4 weken, live resultaat binnen de bandbreedte van de backtest.</div></div><div class="money">€0<small>week 4–10</small></div></li>
+    <li><div style="display:flex;flex-direction:column;gap:6px"><h3>Klein live</h3><p>Echte orders met een klein bedrag, om slippage en operationele fouten te meten.</p><div class="gate"><b>Poort:</b> slippage ≤ aanname, geen onverklaarde verschillen.</div></div><div class="money">€1.000<small>maand 3–4</small></div></li>
+    <li><div style="display:flex;flex-direction:column;gap:6px"><h3>Opschalen</h3><p>Maximaal €5.000 per strategie, €2.000–3.000 blijft reserve. Stopregel: −15% drawdown betekent stoppen en evalueren.</p><div class="gate"><b>Poort:</b> elke maand vergelijken met verwachting.</div></div><div class="money">≤ €7.000<small>maand 5+</small></div></li>
+  </ol>
+</section>
+
+<section aria-labelledby="h-as">
+  <div class="assume">
+    <h3 id="h-as">Aannames en grenzen van dit onderzoek</h3>
+    <ul>
+      <li>Alle markten zijn synthetisch: willekeurige koersen met ~0,6% volatiliteit per uur, 2 jaar uurdata, 0,05% fee per trade.</li>
+      <li>Het funding-model heeft twee regimes (positief en −4%/jr) die gemiddeld elke 60 dagen wisselen. Dit zijn aannames, geen fit op echte data.</li>
+      <li>De staartrisico's (3%/jr beursverlies, 5%/jr gebroken hedge) zijn schattingen. Ze bepalen de uitkomst sterk; vervang ze door eigen inschatting.</li>
+      <li>De LVR-formule geldt voor een constant-product pool met continue arbitrage; geconcentreerde liquiditeit is benaderd met factor k.</li>
+      <li>Volgende stap: dezelfde tests op echte historische data zodra de netwerktoegang openstaat.</li>
+    </ul>
+  </div>
+</section>
+</div>
+
+<script>
+const DATA = __DATA__;
+const $ = id => document.getElementById(id);
+const eur = v => (v < 0 ? "−€" : "€") + Math.abs(Math.round(v)).toLocaleString("nl-NL");
+const eurS = v => (v < 0 ? "−€" : "+€") + Math.abs(Math.round(v)).toLocaleString("nl-NL");
+const pct = (v, d=1) => (v*100).toLocaleString("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d}) + "%";
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;}
+function tipFor(card){let t=card.querySelector(".tip");if(!t){t=document.createElement("div");t.className="tip";t.hidden=true;card.appendChild(t);}return t;}
+function showTip(card, evt, html){const t=tipFor(card);t.innerHTML=html;t.hidden=false;const r=card.getBoundingClientRect();let x=evt.clientX-r.left+12,y=evt.clientY-r.top-10;const w=t.offsetWidth;if(x+w>r.width-8)x=evt.clientX-r.left-w-12;t.style.left=x+"px";t.style.top=y+"px";}
+function hideTip(card){tipFor(card).hidden=true;}
+function niceTicks(min,max,count){const span=max-min,step0=span/count,mag=Math.pow(10,Math.floor(Math.log10(step0))),err=step0/mag;const step=(err>=7.5?10:err>=3.5?5:err>=1.5?2:1)*mag;const out=[];for(let v=Math.ceil(min/step)*step;v<=max+1e-9;v+=step)out.push(Math.round(v));return out;}
+const kfmt = v => v===0?"0":(v<0?"−":"")+"€"+(Math.abs(v)>=1000?(Math.abs(v)/1000)+"k":Math.abs(v));
+
+/* scatter */
+function drawScatter(){
+  const svg=$("sc");svg.innerHTML="";const card=$("card-of");
+  const W=560,H=380,m={l:58,r:14,t:12,b:46};
+  const xs=[0,90000], ys=[-10000,30000];
+  const X=v=>m.l+(v-xs[0])/(xs[1]-xs[0])*(W-m.l-m.r), Y=v=>H-m.b-(v-ys[0])/(ys[1]-ys[0])*(H-m.t-m.b);
+  for(const t of niceTicks(ys[0],ys[1],4)){el("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),stroke:t===0?css("--ink-3"):css("--grid"),"stroke-width":t===0?1.5:1},svg);el("text",{x:m.l-8,y:Y(t)+4,"text-anchor":"end"},svg).textContent=kfmt(t);}
+  for(const t of niceTicks(xs[0],xs[1],5)){el("text",{x:X(t),y:H-m.b+18,"text-anchor":"middle"},svg).textContent=kfmt(t);}
+  el("text",{x:(m.l+W-m.r)/2,y:H-8,"text-anchor":"middle",class:"axis-title"},svg).textContent="Resultaat beste backtest, jaar 1";
+  const yt=el("text",{x:14,y:(m.t+H-m.b)/2,"text-anchor":"middle",class:"axis-title",transform:`rotate(-90 14 ${(m.t+H-m.b)/2})`},svg);yt.textContent="Resultaat jaar 2";
+  el("text",{x:W-m.r,y:Y(0)+16,"text-anchor":"end"},svg).textContent="verlies ↓";
+  const sets=[["r","--s1","Willekeurige markt"],["e","--s2","Klein momentum"]];
+  sets.forEach(([k,c,name])=>{
+    const d=DATA[k];
+    d.ins.forEach((xv,i)=>{
+      const yv=d.oos[i];
+      const cx=X(Math.min(xv,xs[1])),cy=Y(Math.max(ys[0],Math.min(yv,ys[1])));
+      el("circle",{cx,cy,r:4,fill:css(c),"fill-opacity":.72,stroke:css("--surface"),"stroke-width":1},svg);
+      const hit=el("circle",{cx,cy,r:9,fill:"transparent"},svg);
+      hit.addEventListener("pointermove",e=>showTip(card,e,`${name}<br>backtest ${eurS(xv)}<br>jaar 2 ${eurS(yv)}`));
+      hit.addEventListener("pointerleave",()=>hideTip(card));
+    });
+  });
+}
+
+/* grouped bars */
+function drawBars(){
+  const svg=$("bars");svg.innerHTML="";const card=$("card-fa");
+  const W=480,H=380,m={l:58,r:10,t:12,b:46};
+  const lv=[0.05,0.10,0.15,0.25];
+  const rows=lv.map(b=>({b,no:DATA.sens.find(s=>s.bull===b&&!s.tails),yes:DATA.sens.find(s=>s.bull===b&&s.tails)}));
+  const ys=[-200,800];
+  const Y=v=>H-m.b-(v-ys[0])/(ys[1]-ys[0])*(H-m.t-m.b);
+  for(const t of niceTicks(ys[0],ys[1],5)){el("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),stroke:t===0?css("--ink-3"):css("--grid"),"stroke-width":t===0?1.5:1},svg);el("text",{x:m.l-8,y:Y(t)+4,"text-anchor":"end"},svg).textContent=kfmt(t);}
+  const gw=(W-m.l-m.r)/rows.length,bw=Math.min(34,gw*0.3);
+  rows.forEach((r,i)=>{
+    const cx=m.l+gw*i+gw/2;
+    [[r.no,"--s1",-1,"Zonder staartrisico"],[r.yes,"--s2",1,"Met staartrisico"]].forEach(([d,c,side,name])=>{
+      const v=d.mean,x=cx+side*(bw/2+1)-bw/2,y0=Y(0),y1=Y(v);
+      const top=Math.min(y0,y1),h=Math.max(1,Math.abs(y1-y0));
+      const rad=Math.min(4,h/2);
+      const p = v>=0
+        ? `M${x},${y0}V${top+rad}Q${x},${top} ${x+rad},${top}H${x+bw-rad}Q${x+bw},${top} ${x+bw},${top+rad}V${y0}Z`
+        : `M${x},${y0}V${top+h-rad}Q${x},${top+h} ${x+rad},${top+h}H${x+bw-rad}Q${x+bw},${top+h} ${x+bw},${top+h-rad}V${y0}Z`;
+      el("path",{d:p,fill:css(c)},svg);
+      el("text",{x:x+bw/2,y:v>=0?top-6:top+h+14,"text-anchor":"middle"},svg).textContent=eurS(v);
+      const hit=el("rect",{x:x-3,y:m.t,width:bw+6,height:H-m.t-m.b,fill:"transparent"},svg);
+      hit.addEventListener("pointermove",e=>showTip(card,e,`Funding ${pct(r.b,0)}/jr · ${name}<br>verwacht ${eurS(v)}<br>mediaan ${eurS(d.median)}<br>5% slechtst ${eurS(d.p05)}<br>kans op verlies ${pct(d.loss_share,0)}`));
+      hit.addEventListener("pointerleave",()=>hideTip(card));
+    });
+    el("text",{x:cx,y:H-m.b+18,"text-anchor":"middle"},svg).textContent=pct(r.b,0)+"/jr";
+  });
+  el("text",{x:(m.l+W-m.r)/2,y:H-8,"text-anchor":"middle",class:"axis-title"},svg).textContent="Gemiddelde funding in positief regime";
+  const yt=el("text",{x:14,y:(m.t+H-m.b)/2,"text-anchor":"middle",class:"axis-title",transform:`rotate(-90 14 ${(m.t+H-m.b)/2})`},svg);yt.textContent="Verwachte winst per jaar";
+}
+
+function fillTables(){
+  let h="<tr><th>Funding</th><th>Staartrisico</th><th>Verwacht</th><th>Mediaan</th><th>5% slechtst</th><th>Kans verlies</th></tr>";
+  DATA.sens.forEach(s=>{h+=`<tr><td>${pct(s.bull,0)}/jr</td><td>${s.tails?"ja":"nee"}</td><td>${eurS(s.mean)}</td><td>${eurS(s.median)}</td><td>${eurS(s.p05)}</td><td>${pct(s.loss_share,0)}</td></tr>`;});
+  $("sens-tbl").innerHTML=h;
+  h="<tr><th>Hefboom</th><th>Instap-drempel</th><th>Mediaan</th><th>5% slechtst</th><th>95% best</th><th>Kans verlies</th></tr>";
+  DATA.grid.filter(g=>g.thresh===0.05||g.thresh===0.1).forEach(g=>{h+=`<tr><td>${g.lev}×</td><td>${pct(g.thresh,0)}/jr</td><td>${eurS(g.median)}</td><td class="${g.p05<-1000?'neg':''}">${eurS(g.p05)}</td><td>${eurS(g.p95)}</td><td>${pct(g.loss_share,0)}</td></tr>`;});
+  $("grid-tbl").innerHTML=h;
+}
+
+/* math helpers */
+function normInv(p){const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.357751867269,-30.66479806614716,2.506628277459239],b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],c=[-.007784894002430293,-.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[.007784695709041462,.3224671290700398,2.445134137142996,3.754408661907416];const pl=.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+function normCdf(x){const t=1/(1+.2316419*Math.abs(x)),d=.3989423*Math.exp(-x*x/2);let p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p;}
+const num = id => parseFloat($(id).value)||0;
+
+function calcDSR(){
+  const N=Math.max(1,num("d-n")),T=Math.max(.1,num("d-t")),SR=num("d-sr"),g=.5772156649;
+  const s0=1/Math.sqrt(T);
+  const emax = N<=1?0:s0*((1-g)*normInv(1-1/N)+g*normInv(1-1/(N*Math.E)));
+  const psr=normCdf((SR-emax)*Math.sqrt(T));
+  $("d-emax").textContent=emax.toFixed(2);$("d-psr").textContent=pct(psr,0);
+  $("d-v").innerHTML = psr>0.95?'<span class="pill good">Sterk</span> Deze Sharpe is waarschijnlijk geen toeval. Door naar paper trading.':psr>0.5?'<span class="pill warn">Twijfel</span> Meer data nodig of minder pogingen tellen.':'<span class="pill crit">Waarschijnlijk toeval</span> Met zoveel pogingen vind je dit ook zonder edge.';
+}
+function calcFund(){
+  const C=num("f-c"),L=Math.max(0.01,num("f-l")),f=num("f-f")/100,q=num("f-q")/100,n=num("f-n"),c=num("f-cost")/100,p=num("f-p")/100,s=num("f-s")/100;
+  const no=C*L/(L+1),g=no*f*q,k=n*no*c,t=p*s*C,e=g-k-t,b=g-k-s*C;
+  $("f-g").textContent=eurS(g);$("f-k").textContent=eurS(-k);$("f-t").textContent=eurS(-t);
+  $("f-e").innerHTML=`<span class="${e<0?'neg':'pos'}">${eurS(e)}</span> <span style="color:var(--ink-3);font-weight:400">(${pct(C?e/C:0)})</span>`;
+  $("f-b").innerHTML=`<span class="neg">${eurS(b)}</span>`;
+}
+function calcLP(){
+  const s=num("l-s")/100,f=num("l-f")/100,k=Math.max(1,num("l-k")),g=num("l-g")/100;
+  const fo=f*k,lo=k*s*s/8,n=fo-lo-g;
+  $("l-fo").textContent=pct(fo);$("l-lo").textContent="−"+pct(lo);
+  $("l-n").innerHTML=`<span class="${n<0?'neg':'pos'}">${n<0?"−":"+"}${pct(Math.abs(n))}</span>`;
+  const be=Math.sqrt(8*f);
+  $("l-v").textContent=`Bij deze fee-opbrengst is LP'en alleen winstgevend onder σ ≈ ${pct(be,0)} per jaar (voor beheerkosten). Concentratie vergroot fees én LVR even hard.`;
+}
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function calcKelly(seed){
+  const p=num("k-p")/100,b=Math.max(.01,num("k-b")),u=num("k-u")/100;
+  const kf=Math.max(0,p-(1-p)/b);
+  const rows=[["Volle Kelly",kf],["Halve Kelly",kf/2],["Jouw inzet",u]];
+  const rnd=mulberry(seed||12345);
+  let h="<tr><th>Inzet</th><th>% per trade</th><th>Mediaan eind</th><th>Kans eindigt onder €10k</th><th>Kans drawdown &gt; 50%</th></tr>";
+  rows.forEach(([name,f])=>{
+    const ends=[];let dd50=0,below=0;
+    for(let i=0;i<1000;i++){let w=10000,pk=w,hit=false;for(let j=0;j<200;j++){w*= rnd()<p?1+f*b:1-f; if(w>pk)pk=w; if(w<pk*.5)hit=true;}ends.push(w);if(hit)dd50++;if(w<10000)below++;}
+    ends.sort((a,b)=>a-b);
+    h+=`<tr><td>${name}</td><td>${pct(f)}</td><td>${eur(ends[500])}</td><td>${pct(below/1000,0)}</td><td class="${dd50/1000>.2?'neg':''}">${pct(dd50/1000,0)}</td></tr>`;
+  });
+  $("k-tbl").innerHTML=h;
+  $("k-v").textContent = kf<=0 ? "Geen positieve verwachting: bij deze winkans en verhouding is elke inzet te veel." : `Kelly zegt maximaal ${pct(kf)} per trade. Boven Kelly daalt het verwachte groeitempo en stijgt de kans op een halvering sterk.`;
+}
+
+function all(){calcDSR();calcFund();calcLP();}
+document.querySelectorAll(".calc input").forEach(i=>i.addEventListener("input",()=>{all();if(i.id.startsWith("k-"))calcKelly();}));
+$("k-run").addEventListener("click",()=>calcKelly(Math.floor(Math.random()*1e9)));
+function drawAll(){drawScatter();drawBars();}
+fillTables();all();calcKelly();drawAll();
+new MutationObserver(drawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",drawAll);
+</script>
